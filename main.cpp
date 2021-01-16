@@ -25,6 +25,7 @@ int main(int argc, char *argv[])
         }
 
         QStringList codeList;
+        bool isHeadOnly = false;
         while (!inFile.atEnd()) {
             QString line = inFile.readLine();
             QString header = "<source>";
@@ -32,9 +33,15 @@ int main(int argc, char *argv[])
             bool hasHeader = line.contains(header);
             bool hasTail = line.contains(tail);
 
-            if (!hasHeader && !hasTail) {
-                continue;
-            } else {
+            if (hasHeader && !hasTail) {
+                isHeadOnly = true;
+            }
+            if (isHeadOnly && !hasHeader && hasTail) {
+                isHeadOnly = false;
+            }
+            bool isContent = !hasHeader && !hasTail && isHeadOnly;
+
+            if (hasHeader || hasTail || isContent) {
                 QString code = line.trimmed();
                 if (hasHeader) code.replace(header, "");
                 if (hasTail) code.replace(tail, "");
